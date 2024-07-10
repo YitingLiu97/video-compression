@@ -5,21 +5,9 @@ const path = require('path');
 const fs = require('fs');
 
 const app = express();
-const upload = multer({ dest: 'uploads/' });
 // Serve static files (HTML, CSS, JS)
 
-// Set up multer with dynamic upload directory creation
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        if (!fs.existsSync(uploadDir)){
-            fs.mkdirSync(uploadDir);
-        }
-        cb(null, uploadDir);
-    },
-    filename: function (req, file, cb) {
-        cb(null, file.originalname);
-    }
-});
+const upload = multer({ dest: 'uploads/' });
 
 app.use(express.static(path.join(__dirname)));
 
@@ -31,18 +19,17 @@ app.get('/', (req, res) => {
 app.post('/compress', upload.single('video'), (req, res) => {
     const inputPath = req.file.path;
     const outputPath = `compressed_${Date.now()}.mp4`;
-
     ffmpeg(inputPath)
         .output(outputPath)
         .videoCodec('libx264')
-        .outputOptions('-crf 28')
+        .outputOptions('-crf 28') // Set width to 640 and maintain aspect ratio for height //-vf scale=640:-1
         .on('end', () => {
             res.download(outputPath, (err) => {
                 if (err) console.error(err);
                 fs.unlinkSync(inputPath);
                 fs.unlinkSync(outputPath);
             });
-            getFilesInDirectory(); 
+           // getFilesInDirectory(); 
         })
         .on('error', (err) => {
             console.error(err);
@@ -56,15 +43,14 @@ app.listen(3000, () => {
 });
 
 function removeDirectory(){
-   
     if(fs.existsSync(upload)){
         fs.rmdirSync(upload, {recursive: true});
-        console.log("Removed the uploads directory:", uploadDir);
-        fs.mkdirSync(uploadDir);
-        console.log("Recreated the uploads directory:", uploadDir);    }
+        console.log("Removed the uploads directory:", upload);
+        fs.mkdirSync(upload);
+        console.log("Recreated the uploads directory:", upload);    }
 }
 
-setInterval(removeDirectory,3600000); // 1 hour interval to remove all 
+//setInterval(removeDirectory,3600000); // 1 hour interval to remove all 
 // Function to get current filenames 
 // in directory with specific extension 
 function getFilesInDirectory() { 
