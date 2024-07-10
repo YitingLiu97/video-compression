@@ -16,7 +16,6 @@ document.getElementById('uploadBtn').addEventListener('click', async () => {
     if (response.ok) {
         const blob = await response.blob();
         const videoURL = URL.createObjectURL(blob);
-
         const videoPreview = document.getElementById('videoPreview');
         videoPreview.src = videoURL;
         videoPreview.load();
