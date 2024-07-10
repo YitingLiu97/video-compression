@@ -1,0 +1,10 @@
+#videoPreview{
+    width: 500px;
+    height: auto;
+    border-radius: 10px;
+}
+
+
+button{
+    background-color: yellow;
+}
