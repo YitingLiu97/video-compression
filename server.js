@@ -4,6 +4,9 @@ const ffmpeg = require('fluent-ffmpeg');
 const path = require('path');
 const fs = require('fs');
 
+// Set FFmpeg path
+const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
+
 const app = express();
 // Serve static files (HTML, CSS, JS)
 
@@ -22,7 +25,11 @@ app.post('/compress', upload.single('video'), (req, res) => {
     ffmpeg(inputPath)
         .output(outputPath)
         .videoCodec('libx264')
-        .outputOptions('-crf 28') // Set width to 640 and maintain aspect ratio for height //-vf scale=640:-1
+        .outputOptions([
+            '-crf 28', // Adjust this value to control the quality
+            '-b:v 1M', // Bitrate: 1M is a good starting point, adjust as needed
+            '-vf scale=640:-1' // Set width to 640 and maintain aspect ratio for height
+        ]) // Set width to 640 and maintain aspect ratio for height //
         .on('end', () => {
             res.download(outputPath, (err) => {
                 if (err) console.error(err);
