@@ -3,7 +3,6 @@ const multer = require('multer');
 const ffmpeg = require('fluent-ffmpeg');
 const path = require('path');
 const fs = require('fs');
-const findRemoveSync = require('find-remove')
 
 const app = express();
 const upload = multer({ dest: 'uploads/' });
@@ -43,10 +42,7 @@ app.post('/compress', upload.single('video'), (req, res) => {
                 fs.unlinkSync(inputPath);
                 fs.unlinkSync(outputPath);
             });
-
             getFilesInDirectory(); 
-            // const stats = fs.statSync(outputPath);
-            // if(stats.size > 1* 1024 * 1024) //1MB in bytes
         })
         .on('error', (err) => {
             console.error(err);
@@ -59,11 +55,8 @@ app.listen(3000, () => {
     console.log('Server is running on port 3000');
 });
 
-
 function removeDirectory(){
    
-    // const result = findRemoveSync(__dirname + '/uploads', { age: { seconds: 3600 }, extensions: ['.mp4', '.mov'] });
-
     if(fs.existsSync(upload)){
         fs.rmdirSync(upload, {recursive: true});
         console.log("Removed the uploads directory:", uploadDir);
@@ -71,9 +64,7 @@ function removeDirectory(){
         console.log("Recreated the uploads directory:", uploadDir);    }
 }
 
-  
-setInterval(removeDirectory,3600000); 
-
+setInterval(removeDirectory,3600000); // 1 hour interval to remove all 
 // Function to get current filenames 
 // in directory with specific extension 
 function getFilesInDirectory() { 
